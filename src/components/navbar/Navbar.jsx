@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import logo from "../../assests/logo2.png";
@@ -9,66 +9,53 @@ import { login, logout } from "../../redux/actions/authaction";
 const Navbar = ({ notifyMsg }) => {
   const [toggle, setToggle] = useState(false);
 
-  const user = useSelector((state) => state.auth?.user);
-
-  const { accessToken } = useSelector((state) => state.auth);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // ✅ Get auth state from Redux
+  const { user, accessToken, loading } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      notifyMsg(
-        "success",
-        `Welcome! ${user?.name}, You Logged in Successfully`
-      );
-    }
-  }, [isLoggedIn, user, notifyMsg]);
-
   const handleLogin = () => {
     dispatch(login());
-    setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
     dispatch(logout());
-    notifyMsg("success", "Logged Out Successfully !");
+    notifyMsg("success", "Logged Out Successfully!");
   };
 
   return (
-    <div className="signlang_navbar  gradient__bg">
+    <div className="signlang_navbar gradient__bg">
       <div className="singlang_navlinks">
+        {/* Logo */}
         <div className="signlang_navlinks_logo">
-          <a href="/">
+          <Link to="/">
             <img className="logo" src={logo} alt="logo" />
-          </a>
+          </Link>
         </div>
 
+        {/* Desktop Links */}
         <div className="signlang_navlinks_container">
-          <p>
-            <Link to="/">Home</Link>
-          </p>
+          <p><Link to="/">Home</Link></p>
+          <p><Link to="/detect">Detect</Link></p>
+          <p><Link to="/resources">Resources</Link></p>
 
-          <p>
-            <Link to="/detect">Detect</Link>
-          </p>
-
-          <p>
-            <Link to="/resources">Resources</Link>
-          </p>
-
-          {accessToken && (
-            <p>
-              <Link to="/dashboard">Dashboard</Link>
-            </p>
+          {accessToken && user && (
+            <p><Link to="/dashboard">Dashboard</Link></p>
           )}
         </div>
 
+        {/* Desktop Auth */}
         <div className="signlang_auth-data">
-          {accessToken ? (
+          {loading ? (
+            <span className="auth-loading">Loading...</span>
+          ) : accessToken && user ? (
             <>
-              <img src={user?.photoURL} alt="user-icon" />
+              <img
+                src={user.photoURL}
+                alt="user"
+                className="user-avatar"
+                referrerPolicy="no-referrer"
+              />
               <button type="button" onClick={handleLogout}>
                 Logout
               </button>
@@ -81,42 +68,41 @@ const Navbar = ({ notifyMsg }) => {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <div className="signlang__navbar-menu">
         {toggle ? (
-          <RiCloseLine
-            color="#fff"
-            size={27}
-            onClick={() => setToggle(false)}
-          />
+          <RiCloseLine color="#fff" size={27} onClick={() => setToggle(false)} />
         ) : (
           <RiMenu3Line color="#fff" size={27} onClick={() => setToggle(true)} />
         )}
+
         {toggle && (
           <div className="signlang__navbar-menu_container scale-up-center">
             <div className="signlang__navbar-menu_container-links">
-              <p>
-                <Link to="/">Home</Link>
-              </p>
+              <p><Link to="/" onClick={() => setToggle(false)}>Home</Link></p>
+              <p><Link to="/detect" onClick={() => setToggle(false)}>Detect</Link></p>
+              <p><Link to="/resources" onClick={() => setToggle(false)}>Resources</Link></p>
 
-              <p>
-                <Link to="/detect">Detect</Link>
-              </p>
-
-              <p>
-                <Link to="/resources">Resources</Link>
-              </p>
-
-              {accessToken && (
+              {accessToken && user && (
                 <p>
-                  <Link to="/dashboard">Dashboard</Link>
+                  <Link to="/dashboard" onClick={() => setToggle(false)}>
+                    Dashboard
+                  </Link>
                 </p>
               )}
             </div>
 
             <div className="signlang__navbar-menu_container-links-authdata">
-              {accessToken ? (
+              {loading ? (
+                <span className="auth-loading">Loading...</span>
+              ) : accessToken && user ? (
                 <>
-                  <img src={user?.photoURL} alt="user-icon" />
+                  <img
+                    src={user.photoURL}
+                    alt="user"
+                    className="user-avatar"
+                    referrerPolicy="no-referrer"
+                  />
                   <button type="button" onClick={handleLogout}>
                     Logout
                   </button>

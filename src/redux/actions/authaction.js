@@ -12,25 +12,21 @@ import {
 
 export const login = () => async (dispatch) => {
   try {
-    dispatch({
-      type: LOGIN_REQ,
-    });
+    dispatch({ type: LOGIN_REQ });
 
     const provider = new firebase.auth.GoogleAuthProvider();
-    
     const res = await auth.signInWithPopup(provider);
 
-    const accessToken = res.credential.accessToken;
+    const accessToken = await res.user.getIdToken();
 
     const profile = {
-      name: res.additionalUserInfo.profile.name,
-      photoURL: res.additionalUserInfo.profile.picture,
-      userId: res.additionalUserInfo.profile.id,
+      name: res.user.displayName,
+      photoURL: res.user.photoURL,
+      userId: res.user.uid,
     };
-    
 
-    Cookies.set('sign-language-ai-access-token', accessToken, { expires: 2 });
-    Cookies.set('sign-language-ai-user', JSON.stringify(profile) , { expires: 2 })
+    Cookies.set("sign-language-ai-access-token", accessToken, { expires: 2 });
+    Cookies.set("sign-language-ai-user", JSON.stringify(profile), { expires: 2 });
 
     dispatch({
       type: LOGIN_SUCCESS,
@@ -48,6 +44,7 @@ export const login = () => async (dispatch) => {
     });
   }
 };
+
 
 
 export const logout = () => async dispatch =>{

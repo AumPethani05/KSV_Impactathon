@@ -10,28 +10,46 @@ const initialState = {
 }
 
 
-export const authReducer = (state = initialState, action)=>{
-      
-    const {type,payload} = action
+export const authReducer = (state = initialState, action) => {
+  const { type, payload } = action;
 
-    switch(type){
+  switch (type) {
+    case LOGIN_REQ:
+      return { ...state, loading: true };
 
-        case LOGIN_REQ:
-            return {...state,loading:true}
-        
-        case LOGIN_SUCCESS:
-            return {...state, accessToken:payload, loading:false}
+    case LOGIN_SUCCESS:
+      return {
+        ...state,
+        accessToken: payload,
+        loading: false,
+        error: null,
+      };
 
-        case LOGIN_FAIL:
-            return {...state, accessToken:null, loading: false, error: payload}
+    case LOAD_PROF:
+      return {
+        ...state,
+        user: payload,
+        loading: false,
+      };
 
-        case LOAD_PROF:
-            return {...state, user: payload}
+    case LOGIN_FAIL:
+      return {
+        ...state,
+        accessToken: null,
+        user: null,
+        loading: false,
+        error: payload,
+      };
 
-        case LOGOUT:
-            return {...state, accessToken: null, user: null}
+    case LOGOUT:
+      return {
+        ...state,
+        accessToken: null,
+        user: null,
+        loading: false,
+      };
 
-        default:
-            return state
-    }
-}
+    default:
+      return state;
+  }
+};
